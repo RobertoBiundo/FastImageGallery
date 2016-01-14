@@ -7,12 +7,14 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.LruCache;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.GridLayout.LayoutParams;
+import android.widget.LinearLayout;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -23,6 +25,7 @@ public class GalleryAdapter extends BaseAdapter {
     private Context context;
     private ArrayList<String> items;
     private LruCache<String, Bitmap> memoryCache;
+    private LayoutInflater inflater;
 
     public GalleryAdapter(Context context, ArrayList<String> items) {
         this.context = context;
@@ -36,6 +39,8 @@ public class GalleryAdapter extends BaseAdapter {
                 return bitmap.getByteCount();
             }
         };
+
+        inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
@@ -57,19 +62,14 @@ public class GalleryAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ImageView imageView;
 
-        if (convertView == null) {
-            imageView = new ImageView(context);
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageView.setLayoutParams(new GridView.LayoutParams(
-                    LayoutParams.MATCH_PARENT, 300));
-        } else {
-            imageView = (ImageView) convertView;
-        }
+        if (convertView == null)
+            convertView = inflater.inflate(R.layout.row_imagecell, null);
 
+        imageView = (ImageView) convertView.findViewById(R.id.iv_ImageView);
 
         loadBitmap(position + ".jpg", imageView);
 
-        return imageView;
+        return convertView;
     }
 
     public void loadBitmap(String imageName, ImageView imageView) {
@@ -139,7 +139,7 @@ public class GalleryAdapter extends BaseAdapter {
         @Override
         protected Bitmap doInBackground(String... params) {
             imageName = params[0];
-            final Bitmap bitmap = decodeSampledBitmapFromResource(context.getCacheDir(), imageName, 200, 200);
+            final Bitmap bitmap = decodeSampledBitmapFromResource(context.getCacheDir(), imageName, 400, 400);
             addBitmapToMemoryCache(imageName, bitmap);
             return bitmap;
         }
