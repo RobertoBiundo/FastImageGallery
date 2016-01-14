@@ -76,6 +76,8 @@ public class GalleryAdapter extends BaseAdapter {
         if (cancelPotentialWork(imageName, imageView)) {
             final BitmapWorkerTask task = new BitmapWorkerTask(imageView);
             task.execute(imageName);
+            AsyncImage imageDrawble = new AsyncImage(task);
+            imageView.setImageDrawable(imageDrawble);
         }
     }
 
@@ -96,7 +98,7 @@ public class GalleryAdapter extends BaseAdapter {
 
         if (bitmapWorkerTask != null) {
             final String bitmapImageName = bitmapWorkerTask.imageName;
-            if (!bitmapImageName.equals(imageName)) {
+            if (bitmapImageName!= null && imageName != null && !bitmapImageName.equals(imageName)) {
                 bitmapWorkerTask.cancel(true);
             } else {
                 return false;
@@ -109,7 +111,7 @@ public class GalleryAdapter extends BaseAdapter {
         if (imageView != null) {
             final Drawable image = imageView.getDrawable();
             if (image instanceof AsyncImage) {
-                final AsyncImage asyncImage = (AsyncImage) image;
+                AsyncImage asyncImage = (AsyncImage) image;
                 return asyncImage.getBitmapWorkerTask();
             }
         }
